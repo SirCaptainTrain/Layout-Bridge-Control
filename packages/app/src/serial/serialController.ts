@@ -3,7 +3,7 @@ import { v4 } from 'uuid'
 import dotenv from 'dotenv'
 import { SerialControlInterface } from './serialTypes'
 import { TMCCSerialInterface } from './tmcc/tmccSerialInterface'
-import { LCSSerialInterface } from './lcs/lcsSerialInterface'
+import { LegacySerialInterface } from './legacy/legacySerialInterface'
 import { PortInfo } from '@serialport/bindings-interface'
 
 dotenv.config()
@@ -280,7 +280,7 @@ export const SerialController = (): SerialController => {
                 return TMCCSerialInterface(port)
             }
             case 'LEGACY': {
-                return LCSSerialInterface(port)
+                return LegacySerialInterface(port)
             }
             default:
                 throw new Error(`Invalid type: ${type}`)
