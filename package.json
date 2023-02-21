@@ -1,0 +1,13 @@
+{
+    "name": "OGaugejs",
+    "version": "1.0.0",
+    "license": "MIT",
+    "private": true,
+    "workspaces": [
+        "packages/app",
+        "packages/web"
+    ],
+    "devDependencies": {
+        "typescript": "^4.9.5"
+    }
+}
