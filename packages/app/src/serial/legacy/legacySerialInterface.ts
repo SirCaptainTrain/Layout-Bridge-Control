@@ -3,12 +3,12 @@ import { v4 } from 'uuid'
 import { SerialInterface } from '../serialInterface'
 import { SerialControlInterface, SerialInterfaceCommand } from '../serialTypes'
 import {
-    LCS_COMMAND,
-    LCS_COMMAND_FIELD,
-    LCS_FIRST_BYTE,
-} from './lcsSerialTypes'
+    LEGACY_COMMAND,
+    LEGACY_COMMAND_FIELD,
+    LEGACY_FIRST_BYTE,
+} from './legacySerialTypes'
 
-export const LCSSerialInterface = (
+export const LegacySerialInterface = (
     serialPort: SerialPort
 ): SerialControlInterface => {
     const serialInterface = SerialInterface()
@@ -25,7 +25,7 @@ export const LCSSerialInterface = (
             writeInterval?: number
         }
     ): SerialInterfaceCommand => {
-        console.log('Building LCS Command', buffers)
+        console.log('Building LEGACY Command', buffers)
         return {
             id: v4(),
             commandBuffers: buffers,
@@ -41,7 +41,7 @@ export const LCSSerialInterface = (
         dataField: number | string,
         dataFieldExtra?: number | string
     ): Buffer[] => {
-        const command0 = LCS_FIRST_BYTE
+        const command0 = LEGACY_FIRST_BYTE
         const command1 = (deviceId << 1) | commandField
         const command2 = getInputDataField(dataField)
 
@@ -56,7 +56,7 @@ export const LCSSerialInterface = (
         const engineIdParsed = getEngineId(engineId)
         const buffers = buildBuffers(
             engineIdParsed,
-            LCS_COMMAND_FIELD.COMMAND_0,
+            LEGACY_COMMAND_FIELD.COMMAND_0,
             speed
         )
         const command = buildCommand(buffers)
@@ -67,8 +67,8 @@ export const LCSSerialInterface = (
         const engineIdParsed = getEngineId(engineId)
         const buffers = buildBuffers(
             engineIdParsed,
-            LCS_COMMAND_FIELD.COMMAND_1,
-            LCS_COMMAND.ENGINE_TOGGLE_DIRECTION
+            LEGACY_COMMAND_FIELD.COMMAND_1,
+            LEGACY_COMMAND.ENGINE_TOGGLE_DIRECTION
         )
         const command = buildCommand(buffers)
         serialInterface.addCommand(command)
@@ -78,8 +78,8 @@ export const LCSSerialInterface = (
         const engineIdParsed = getEngineId(engineId)
         const buffers = buildBuffers(
             engineIdParsed,
-            LCS_COMMAND_FIELD.COMMAND_1,
-            LCS_COMMAND.ENGINE_OPEN_COUPLER_FRONT
+            LEGACY_COMMAND_FIELD.COMMAND_1,
+            LEGACY_COMMAND.ENGINE_OPEN_COUPLER_FRONT
         )
         const command = buildCommand(buffers)
         serialInterface.addCommand(command)
@@ -89,8 +89,8 @@ export const LCSSerialInterface = (
         const engineIdParsed = getEngineId(engineId)
         const buffers = buildBuffers(
             engineIdParsed,
-            LCS_COMMAND_FIELD.COMMAND_1,
-            LCS_COMMAND.ENGINE_BELL_ON
+            LEGACY_COMMAND_FIELD.COMMAND_1,
+            LEGACY_COMMAND.ENGINE_BELL_ON
         )
         const command = buildCommand(buffers)
         serialInterface.addCommand(command)
@@ -100,8 +100,8 @@ export const LCSSerialInterface = (
         const engineIdParsed = getEngineId(engineId)
         const buffers = buildBuffers(
             engineIdParsed,
-            LCS_COMMAND_FIELD.COMMAND_1,
-            LCS_COMMAND.ENGINE_BELL_OFF
+            LEGACY_COMMAND_FIELD.COMMAND_1,
+            LEGACY_COMMAND.ENGINE_BELL_OFF
         )
         const command = buildCommand(buffers)
         serialInterface.addCommand(command)
@@ -115,10 +115,10 @@ export const LCSSerialInterface = (
         }
         const initLevel = level
         const engineIdParsed = getEngineId(engineId)
-        const lcsCommand = LCS_COMMAND.ENGINE_QUILL_HORN >> 4
-        // console.log(lcsCommand.toString(2))
-        // console.log(initLevel, lcsCommand.toString(2), level.toString(2))
-        const combined = lcsCommand.toString(2).concat(level.toString(2))
+        const LEGACYCommand = LEGACY_COMMAND.ENGINE_QUILL_HORN >> 4
+        // console.log(LEGACYCommand.toString(2))
+        // console.log(initLevel, LEGACYCommand.toString(2), level.toString(2))
+        const combined = LEGACYCommand.toString(2).concat(level.toString(2))
         // console.log(
         //     initLevel,
         //     combined,
@@ -127,7 +127,7 @@ export const LCSSerialInterface = (
         // )
         const buffers = buildBuffers(
             engineIdParsed,
-            LCS_COMMAND_FIELD.COMMAND_1,
+            LEGACY_COMMAND_FIELD.COMMAND_1,
             parseInt(combined, 2)
         )
         const command = buildCommand(buffers, { writeInterval: 0 })
