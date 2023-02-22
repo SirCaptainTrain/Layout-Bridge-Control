@@ -167,7 +167,7 @@
                             <div class="mb-3">
                                 <label for="serial" class="form-label">Serial Port</label>
                                 <select class="form-select" id="add-engine-serial">
-                                    <option selected>Select one</option>
+                                    <option value="0" selected>Select one</option>
                                 </select>
                             </div>
                         </div>
@@ -233,13 +233,20 @@
                             Engine Id: <span id="engine-control-id"></span>
                             Path: <span id="engine-control-com"></span>
                         </div>
+                        <hr class="lead" />
                         <div class="mb-3">
                             <button class="btn btn-success" id="engine-control-power-on"><i
-                                    class="fas fa-power-off"></i></button>
+                                    class="fas fa-power-off"></i> (Quick)</button>
+                            <button class="btn btn-success" id="engine-control-power-on-ext"><i
+                                    class="fas fa-power-off"></i> (Ext)</button>
                             <button class="btn btn-danger" id="engine-control-power-off"><i
-                                    class="fas fa-power-off"></i></button>
+                                    class="fas fa-power-off"></i> (Quick)</button>
+                            <button class="btn btn-danger" id="engine-control-power-off-ext"><i
+                                    class="fas fa-power-off"></i> (Ext)</button>
                         </div>
+                        <hr class="lead" />
                         <div class="mb-3">
+                            <div class="mb-1">Direction Control</div>
                             <button class="btn btn-primary" id="engine-control-forward"><i
                                     class="fas fa-backward"></i></button>
                             <button class="btn btn-primary" id="engine-control-toggle"><i
@@ -248,14 +255,41 @@
                                     class="fas fa-forward"></i></button>
                         </div>
                         <div class="mb-3">
-                            <label for="customRange2" class="form-label">Whistle</label>
-                            <input type="range" class="form-range" min="0" max="1" id="engine-control-whistle" value="0"
-                                id="engine-control-whistle">
+                            <label for="engine-control-speed-select" class="form-label">Speed Control</label>
+                            <select class="form-select" id="engine-control-speed-select">
+                                <option value="abs" selected>Absolute</option>
+                                <option value="rel">Relative</option>
+                            </select>
+                        </div>
+                        <div class="mb-3 d-none" id="engine-control-abs-speed">
+                            <button class="btn btn-success" id="engine-control-rel-plus-1"><i
+                                    class="fas fa-1"></i></button>
+                            <button class="btn btn-danger" id="engine-control-rel-minus-1"><i
+                                    class="fas fa-1"></i></button>
+                        </div>
+                        <div class="mb-3 d-none" id="engine-control-rel-speed">
+                            <button class="btn btn-success" id="engine-control-rel-plus-1"><i
+                                    class="fas fa-1"></i></button>
+                            <button class="btn btn-danger" id="engine-control-rel-minus-1"><i
+                                    class="fas fa-1"></i></button>
+                        </div>
+                        <hr class="lead" />
+                        <div class="mb-3 d-none" id="engine-control-whistle-slider-view">
+                            <label for="engine-control-whistle-slider" class="form-label">Whistle (0/<span
+                                    id="engine-control-whistle-max">0)</span></label>
+                            <input type="range" class="form-range" min="0" max="0" id="engine-control-whistle-slider"
+                                value="0" id="engine-control-whistle">
+                        </div>
+                        <div class="mb-3 d-none" id="engine-control-whistle-tmcc-view">
+                            <button class="btn btn-primary" id="engine-control-whistle-tmcc-on"><i
+                                    class="fas fa-wind"></i></button>
+                            <button class="btn btn-danger" id="engine-control-whistle-tmcc-off"><i
+                                    class="fas fa-wind"></i></button>
                         </div>
                         <div class="mb-3">
                             <button class="btn btn-primary" id="engine-control-bell-on"><i
                                     class="fas fa-bell"></i></button>
-                            <button class="btn btn-primary" id="engine-control-bell-off"><i
+                            <button class="btn btn-danger" id="engine-control-bell-off"><i
                                     class="fas fa-bell-slash"></i></button>
                         </div>
                     </div>
@@ -383,9 +417,22 @@
 
     }
 
+    const showWhistleView = (view) => {
+        if (view === "LEGACY") {
+            $('#engine-control-whistle-slider-view').toggleClass('d-none', false)
+            $('#engine-control-whistle-slider').attr('max', 15)
+            $('#engine-control-whistle-tmcc-view').toggleClass('d-none', true)
+        } else {
+            $('#engine-control-whistle-slider-view').toggleClass('d-none', true)
+            $('#engine-control-whistle-tmcc-view').toggleClass('d-none', false)
+        }
+    }
+
     const getEngineList = async () => {
         const enginesRes = await axiosGet('/engine')
         const activeEngineRes = await axiosGet('/engine/active')
+
+        $('#engine-rows').empty()
 
         if (enginesRes.data == null || typeof enginesRes.data !== 'object') {
             throw new Error("Invalid engine types")
@@ -402,8 +449,6 @@
             return
         }
 
-        $('#engine-rows').empty()
-
         for (let engine of enginesRes.data) {
             const match = activeEngines.find((activeEngine) => activeEngine.id === engine.id)
             if (match != null) {
@@ -418,6 +463,8 @@
     const getSerialList = async () => {
         const serialRes = await axiosGet('/serial/available')
         const serialActiveRes = await axiosGet('/serial/active')
+
+        $('#serial-rows').empty()
 
         if (serialRes.data == null || typeof serialRes.data !== 'object') {
             throw new Error("Invalid engine types")
@@ -436,8 +483,6 @@
             return
         }
 
-        $('#serial-rows').empty()
-
         for (let serialPort of serialRes.data) {
             const match = activePorts.find((serial) => serial.serialNumber === serialPort.serialNumber)
             if (match != null) {
@@ -450,8 +495,9 @@
     }
 
     const getControllerList = async () => {
+        $('#controller-rows').empty()
         const controllerRes = await axiosGet('/controller')
-
+        if (controllerRes.status === 204) return
         if (controllerRes.data == null || typeof controllerRes.data !== 'object') {
             throw new Error("Invalid controller type")
         }
@@ -459,8 +505,6 @@
         if (controllerRes.data.length === 0) {
             return
         }
-
-        $('#controller-rows').empty()
 
         for (let controller of controllerRes.data) {
             addController(controller)
@@ -602,19 +646,22 @@
         $('#btn-engine-control').click(async function () {
             if (selectedEngine == null) return
             const engineInfo = engines.find((engine) => engine.id === selectedEngine)
-            console.log(selectedEngine, engineInfo)
+            //console.log(selectedEngine, engineInfo)
+            showWhistleView(engineInfo.controlType)
             $('#engine-control-id').html(engineInfo.controlId)
             $('#engine-control-com').html(`${engineInfo.path} (${engineInfo.controlType})`)
             $('#engine-control').modal('show')
         })
 
-        $('#engine-control-whistle').on('input', async function () {
-            console.log($('#engine-control-whistle').val())
+        $('#engine-control-whistle-slider').on('input', async function () {
+            //console.log($('#engine-control-whistle-slider').val())
+            await axiosPost('/engine/control', { type: 'whistle', whistle: $('#engine-control-whistle-slider').val() })
         })
 
-        $('#engine-control-whistle').on('change', async function () {
+        $('#engine-control-whistle-slider').on('change', async function () {
             await sleep(25)
-            $('#engine-control-whistle').val("0")
+            $('#engine-control-whistle-slider').val("0")
+            await axiosPost('/engine/control', { type: 'whistle', whistle: 0 })
         })
 
         $('#engine-control-bell-on').click(async function () {
@@ -622,14 +669,29 @@
             await axiosPost('/engine/control', { type: 'bellOn' })
         })
 
+        $('#engine-control-bell-off').click(async function () {
+            if (selectedEngine == null) return
+            await axiosPost('/engine/control', { type: 'bellOff' })
+        })
+
         $('#engine-control-power-on').click(async function () {
             if (selectedEngine == null) return
-            await axiosPost('/engine/control', { type: 'powerOn' })
+            await axiosPost('/engine/control', { type: 'startUpFast' })
         })
 
         $('#engine-control-power-off').click(async function () {
             if (selectedEngine == null) return
-            await axiosPost('/engine/control', { type: 'powerOff' })
+            await axiosPost('/engine/control', { type: 'shutDownFast' })
+        })
+
+        $('#engine-control-rel-plus-1').click(async function () {
+            if (selectedEngine == null) return
+            await axiosPost('/engine/control', { type: 'incrementSpeed' })
+        })
+
+        $('#engine-control-rel-minus-1').click(async function () {
+            if (selectedEngine == null) return
+            await axiosPost('/engine/control', { type: 'decrementSpeed' })
         })
 
 

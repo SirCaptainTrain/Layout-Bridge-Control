@@ -19,6 +19,11 @@ export const routerMiddleware = (req, res, next) => {
             }
             case 'whistle': {
                 control.setWhistle(req.body.whistle)
+                break
+            }
+            case 'tmccWhistle': {
+                control.setTMCCWhistle(req.body.whistle)
+                break
             }
             case 'forwardDirection': {
                 control.forwardDirection()
@@ -26,12 +31,31 @@ export const routerMiddleware = (req, res, next) => {
             }
             case 'backwardDirection': {
                 control.backwardDirection()
+                break
             }
             case 'toggleDirection': {
                 control.toggleDirection()
+                break
             }
             case 'setSpeed': {
                 control.setSpeed(req.body.speed)
+                break
+            }
+            case 'incrementSpeed': {
+                control.incrementSpeed()
+                break
+            }
+            case 'decrementSpeed': {
+                control.decrementSpeed()
+                break
+            }
+            case 'startUpFast': {
+                control.startUpFast()
+                break
+            }
+            case 'shutDownFast': {
+                control.shutDownFast()
+                break
             }
         }
     } catch (err) {

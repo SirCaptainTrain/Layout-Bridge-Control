@@ -76,6 +76,30 @@ export const TMCCSerialInterface = (
         serialInterface.addCommand(command)
     }
 
+    const incrementSpeed = (engineId: number | string) => {
+        const engineIdParsed = getEngineId(engineId)
+        const buffers = buildBuffers(
+            TMCC_DEVICE_TYPE.ENGINE,
+            engineIdParsed,
+            TMCC_COMMAND_FIELD.COMMAND_11,
+            TMCC_COMMAND.ENGINE_INCREMENT_SPEED_1.toString(2).padStart(4, '0')
+        )
+        const command = buildCommand(buffers)
+        serialInterface.addCommand(command)
+    }
+
+    const decrementSpeed = (engineId: number | string) => {
+        const engineIdParsed = getEngineId(engineId)
+        const buffers = buildBuffers(
+            TMCC_DEVICE_TYPE.ENGINE,
+            engineIdParsed,
+            TMCC_COMMAND_FIELD.COMMAND_11,
+            TMCC_COMMAND.ENGINE_DECREMENT_SPEED_1.toString(2).padStart(4, '0')
+        )
+        const command = buildCommand(buffers)
+        serialInterface.addCommand(command)
+    }
+
     const toggleDirection = (engineId: number) => {
         const engineIdParsed = getEngineId(engineId)
         const buffers = buildBuffers(
@@ -146,30 +170,7 @@ export const TMCCSerialInterface = (
         toggleDirection,
         setHorn: blowHorn,
         ringBell: toggleBell,
+        incrementSpeed,
+        decrementSpeed,
     }
 }
-
-/** Snippets from cleanup, pending delete */
-// function pad(n: string, width: string | number, z?: string): string {
-//     const nWidth = typeof width === 'string' ? parseInt(width) : width
-//     z = z || '0'
-//     n = n + ''
-//     return (
-//         n.length >= nWidth ? n : new Array(nWidth - n.length + 1).join(z) + n
-//     ).toString()
-// }
-
-// const getShift = (input: number, shift: number = 7, bits: string = '8') => {
-//     let binary = pad(input.toString(2), bits)
-
-//     for (let i = 0; i < shift; i++) {
-//         binary = binary.substring(1) + '0'
-//     }
-
-//     const value = parseInt(binary, 2)
-//     return parseInt(value.toString(10))
-// }
-
-// const getAbsSpeed = (input: number) => {
-//     return input.toString(2)
-// }

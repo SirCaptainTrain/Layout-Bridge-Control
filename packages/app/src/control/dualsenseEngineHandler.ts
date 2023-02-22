@@ -13,6 +13,7 @@ export const DualsenseEngineHandler = (
 
     let analogRightPositiveActive = false
     let analogRightNegativeActive = true
+    let handledAnalogRightNegative = true
     let analogRightLastUpdate = Date.now()
     let analogRightNegativeValue = null
 
@@ -63,6 +64,16 @@ export const DualsenseEngineHandler = (
             if (activeEngine.getSpeed() < activeEngine.getMaxSpeed()) {
                 activeEngine.incrementSpeed()
             }
+        }
+
+        if (
+            handledAnalogRightNegative === false &&
+            analogRightNegativeActive === false
+        ) {
+            if (serial.type === 'LEGACY') {
+                serialInterface.setHorn(activeEngineInfo.controlId, 0)
+            }
+            handledAnalogRightNegative = true
         }
 
         if (analogRightNegativeActive && analogRightNegativeValue < -0.3) {
@@ -235,8 +246,10 @@ export const DualsenseEngineHandler = (
         } else if (analogRightNegativeActive === false && axisValue < -0.15) {
             analogRightNegativeValue = axisValue
             analogRightNegativeActive = true
+            handledAnalogRightNegative = false
         } else if (analogRightNegativeActive && axisValue < -0.15) {
             const lastUpdate = analogRightLastUpdate
+            handledAnalogRightNegative = false
             analogRightLastUpdate = Date.now()
             const now = Date.now()
             if (
@@ -268,6 +281,16 @@ export const DualsenseEngineHandler = (
     const handleCross = (active: boolean) => {}
 
     const validateActiveEngine = () => {
+        console.log('active', engineController.getActiveEngine()?.getId())
+        if (engineController.getActiveEngine() === null) {
+            if (engineController.getEngines().length === 0) {
+                return false
+            }
+            engineController.setActiveEngine(
+                engineController.getEngines()[0].getId()
+            )
+            return false
+        }
         if (engineController.getEngines().length === 1) {
             if (
                 engineController.getActiveEngine().getId() !==
@@ -278,12 +301,6 @@ export const DualsenseEngineHandler = (
                 )
                 return false
             }
-        }
-        if (engineController.getActiveEngine() === null) {
-            engineController.setActiveEngine(
-                engineController.getEngines()[0].getId()
-            )
-            return false
         }
         return true
     }

@@ -13,7 +13,7 @@ export type EngineController = {
     addEngine: (controlPort: ControlPort, engineInfo: EngineInfo) => Engine
     updateEngine: (engineId: string, engineInfo: EngineInfo) => void
     removeEngine: (engineId: string) => void
-    getActiveEngine: () => Engine | null
+    getActiveEngine?: () => Engine | null
     setActiveEngine: (engineId: string) => void
     unsetActiveEngine: () => void
 }
