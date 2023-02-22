@@ -1,6 +1,6 @@
 {
-    "name": "OGaugejs",
-    "version": "1.0.0",
+    "name": "layoutbridgecontrol",
+    "version": "0.0.2-alpha",
     "license": "MIT",
     "private": true,
     "workspaces": [
