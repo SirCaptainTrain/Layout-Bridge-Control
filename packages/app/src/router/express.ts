@@ -25,6 +25,9 @@ export const Router = (
     const app = express()
 
     const control = Control(engineController, serialController)
+    control.startProcessing().then(() => {
+        console.log('Router middleware controller started')
+    })
 
     app.use(cors())
     app.use(express.json())
@@ -99,7 +102,7 @@ export const Router = (
             (device) => device.vendorId === 1356
         )
         if (sonyControllers.length === 0) {
-            res.sendStatus(204)
+            return res.sendStatus(204)
         }
         res.send(sonyControllers)
     })

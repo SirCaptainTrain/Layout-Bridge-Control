@@ -63,6 +63,28 @@ export const LegacySerialInterface = (
         serialInterface.addCommand(command)
     }
 
+    const incrementSpeed = (engineId: number | string) => {
+        const engineIdParsed = getEngineId(engineId)
+        const buffers = buildBuffers(
+            engineIdParsed,
+            LEGACY_COMMAND_FIELD.COMMAND_1,
+            LEGACY_COMMAND.ENGINE_INCREMENT_SPEED_1
+        )
+        const command = buildCommand(buffers)
+        serialInterface.addCommand(command)
+    }
+
+    const decrementSpeed = (engineId: number | string) => {
+        const engineIdParsed = getEngineId(engineId)
+        const buffers = buildBuffers(
+            engineIdParsed,
+            LEGACY_COMMAND_FIELD.COMMAND_1,
+            LEGACY_COMMAND.ENGINE_DECREMENT_SPEED_1
+        )
+        const command = buildCommand(buffers)
+        serialInterface.addCommand(command)
+    }
+
     const toggleDirection = (engineId: number | string) => {
         const engineIdParsed = getEngineId(engineId)
         const buffers = buildBuffers(
@@ -113,12 +135,15 @@ export const LegacySerialInterface = (
         } else if (level > 15) {
             level = 15
         }
+        //console.log('initLevel', level, level.toString(2), level.toString(16))
         const initLevel = level
         const engineIdParsed = getEngineId(engineId)
         const LEGACYCommand = LEGACY_COMMAND.ENGINE_QUILL_HORN >> 4
         // console.log(LEGACYCommand.toString(2))
         // console.log(initLevel, LEGACYCommand.toString(2), level.toString(2))
-        const combined = LEGACYCommand.toString(2).concat(level.toString(2))
+        const combined = LEGACYCommand.toString(2).concat(
+            level.toString(2).padStart(4, '0')
+        )
         // console.log(
         //     initLevel,
         //     combined,
@@ -131,6 +156,28 @@ export const LegacySerialInterface = (
             parseInt(combined, 2)
         )
         const command = buildCommand(buffers, { writeInterval: 0 })
+        serialInterface.addCommand(command)
+    }
+
+    const startUpFast = (engineId: string | number) => {
+        const engineIdParsed = getEngineId(engineId)
+        const buffers = buildBuffers(
+            engineIdParsed,
+            LEGACY_COMMAND_FIELD.COMMAND_1,
+            LEGACY_COMMAND.ENGINE_STARTUP_FAST
+        )
+        const command = buildCommand(buffers)
+        serialInterface.addCommand(command)
+    }
+
+    const shutDownFast = (engineId: string | number) => {
+        const engineIdParsed = getEngineId(engineId)
+        const buffers = buildBuffers(
+            engineIdParsed,
+            LEGACY_COMMAND_FIELD.COMMAND_1,
+            LEGACY_COMMAND.ENGINE_SHUTDOWN_FAST
+        )
+        const command = buildCommand(buffers)
         serialInterface.addCommand(command)
     }
 
@@ -168,7 +215,9 @@ export const LegacySerialInterface = (
         bellOn,
         bellOff,
         setHorn,
-        // setHorn: blowHorn,
-        // ringBell: toggleBell,
+        incrementSpeed,
+        decrementSpeed,
+        startUpFast,
+        shutDownFast,
     }
 }

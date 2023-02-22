@@ -76,6 +76,10 @@ export const TMCCSerialInterface = (
         serialInterface.addCommand(command)
     }
 
+    const incrementSpeed = (engineId: number | string) => {}
+
+    const decrementSpeed = (engineId: number | string) => {}
+
     const toggleDirection = (engineId: number) => {
         const engineIdParsed = getEngineId(engineId)
         const buffers = buildBuffers(

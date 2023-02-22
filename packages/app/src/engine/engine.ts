@@ -1,6 +1,7 @@
 import { ControlType, EngineInfo } from './enginetypes'
 import dotenv from 'dotenv'
 import { ControlPort } from '../serial/serialController'
+import { getControlTypeMaxSpeed, getWhistleStepsMax } from './engineUtil'
 
 dotenv.config()
 const APP_DEBUG = process.env.APP_DEBUG === 'true'
@@ -37,7 +38,7 @@ export const Engine = (
     let bellStatus = false
 
     // Whistle Steps
-    let whistleSteps = 1
+    let whistleSteps = getWhistleStepsMax(engineInfo.controlType)
 
     const getEngineSerial = () => {
         return controlPort
@@ -49,6 +50,7 @@ export const Engine = (
 
     const setEngineInfo = (newengineInfo: EngineInfo) => {
         engineInfo = newengineInfo
+        //console.log('engineInfo', engineInfo)
         switch (engineInfo.controlType) {
             case 'LEGACY': {
                 whistleSteps = 16
@@ -162,22 +164,5 @@ export const Engine = (
         getMaxSpeed,
         getBell,
         getWhistleSteps,
-    }
-}
-
-const getControlTypeMaxSpeed = (controlType: ControlType) => {
-    switch (controlType) {
-        case 'LEGACY': {
-            return 127
-        }
-        case 'ERR': {
-            return 100
-        }
-        case 'TMCC': {
-            return 31
-        }
-        default: {
-            throw new Error(`Invalid control type: ${controlType}`)
-        }
     }
 }

@@ -11,6 +11,8 @@ export type SerialInterfaceCommand = {
 export type SerialControlInterface = {
     setSerialPort: (serialPort: SerialPort) => void
     setSpeed?: (engineId: number | string, speed: number) => void
+    incrementSpeed?: (engineId: number | string) => void
+    decrementSpeed?: (engineId: number | string) => void
     setDirectionForward?: (engineId: number | string) => void
     setDirectionBackward?: (engineId: number | string) => void
     toggleDirection?: (engineId: number | string) => void
@@ -21,4 +23,8 @@ export type SerialControlInterface = {
     bellOff?: (engineId: number | string) => void
     openCouplerForward?: (engineId: number | string) => void
     openCouplerRear?: (engineId: number | string) => void
+    startUpFast?: (engineId: number | string) => void
+    shutDownFast?: (engineId: number | string) => void
+    startUpExt?: (engineId: number | string) => void
+    shutDownExt?: (engineId: number | string) => void
 }
