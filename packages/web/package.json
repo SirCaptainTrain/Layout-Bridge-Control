@@ -1,6 +1,6 @@
 {
     "name": "lbc-web",
-    "version": "0.0.3-alpha",
+    "version": "0.1.0-alpha",
     "license": "MIT",
     "scripts": {
         "build": "yarn tsc",
@@ -15,6 +15,7 @@
         "typescript": "^4.9.5"
     },
     "dependencies": {
+        "cors": "^2.8.5",
         "express": "^4.18.2"
     }
 }

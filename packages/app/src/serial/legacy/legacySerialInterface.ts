@@ -2,6 +2,7 @@ import { SerialPort } from 'serialport'
 import { v4 } from 'uuid'
 import { SerialInterface } from '../serialInterface'
 import { SerialControlInterface, SerialInterfaceCommand } from '../serialTypes'
+import { getEngineId, getInputDataField } from '../serialUtil'
 import {
     LEGACY_COMMAND,
     LEGACY_COMMAND_FIELD,
@@ -85,6 +86,28 @@ export const LegacySerialInterface = (
         serialInterface.addCommand(command)
     }
 
+    const setDirectionForward = (engineId: number | string) => {
+        const engineIdParsed = getEngineId(engineId)
+        const buffers = buildBuffers(
+            engineIdParsed,
+            LEGACY_COMMAND_FIELD.COMMAND_1,
+            LEGACY_COMMAND.ENGINE_FORWARD_DIRECTION
+        )
+        const command = buildCommand(buffers)
+        serialInterface.addCommand(command)
+    }
+
+    const setDirectionBackward = (engineId: number | string) => {
+        const engineIdParsed = getEngineId(engineId)
+        const buffers = buildBuffers(
+            engineIdParsed,
+            LEGACY_COMMAND_FIELD.COMMAND_1,
+            LEGACY_COMMAND.ENGINE_REVERSE_DIRECTION
+        )
+        const command = buildCommand(buffers)
+        serialInterface.addCommand(command)
+    }
+
     const toggleDirection = (engineId: number | string) => {
         const engineIdParsed = getEngineId(engineId)
         const buffers = buildBuffers(
@@ -102,6 +125,17 @@ export const LegacySerialInterface = (
             engineIdParsed,
             LEGACY_COMMAND_FIELD.COMMAND_1,
             LEGACY_COMMAND.ENGINE_OPEN_COUPLER_FRONT
+        )
+        const command = buildCommand(buffers)
+        serialInterface.addCommand(command)
+    }
+
+    const openCouplerRear = (engineId: number | string) => {
+        const engineIdParsed = getEngineId(engineId)
+        const buffers = buildBuffers(
+            engineIdParsed,
+            LEGACY_COMMAND_FIELD.COMMAND_1,
+            LEGACY_COMMAND.ENGINE_OPEN_COUPLER_REAR
         )
         const command = buildCommand(buffers)
         serialInterface.addCommand(command)
@@ -181,37 +215,36 @@ export const LegacySerialInterface = (
         serialInterface.addCommand(command)
     }
 
-    const getEngineId = (engineId: string | number) => {
-        let engineIdParsed: number
-        if (typeof engineId === 'string') {
-            engineIdParsed = parseInt(engineId)
-        } else {
-            engineIdParsed = engineId
-        }
-
-        if (isNaN(engineIdParsed)) {
-            throw new Error(`Invalid engine id: ${engineId}`)
-        }
-        return engineIdParsed
+    const startUpExt = (engineId: string | number) => {
+        const engineIdParsed = getEngineId(engineId)
+        const buffers = buildBuffers(
+            engineIdParsed,
+            LEGACY_COMMAND_FIELD.COMMAND_1,
+            LEGACY_COMMAND.ENGINE_STARTUP_EXT
+        )
+        const command = buildCommand(buffers)
+        serialInterface.addCommand(command)
     }
 
-    const getInputDataField = (dataField: number | string) => {
-        if (typeof dataField === 'number') {
-            return dataField
-        }
-
-        const hexValue = parseInt(dataField, 2)
-        if (isNaN(hexValue)) {
-            throw new Error(`Invalid datafield: ${dataField}`)
-        }
-        return hexValue
+    const shutDownExt = (engineId: string | number) => {
+        const engineIdParsed = getEngineId(engineId)
+        const buffers = buildBuffers(
+            engineIdParsed,
+            LEGACY_COMMAND_FIELD.COMMAND_1,
+            LEGACY_COMMAND.ENGINE_SHUTDOWN_EXT
+        )
+        const command = buildCommand(buffers)
+        serialInterface.addCommand(command)
     }
 
     return {
         setSerialPort,
         setSpeed,
+        setDirectionForward,
+        setDirectionBackward,
         toggleDirection,
         openCouplerForward,
+        openCouplerRear,
         bellOn,
         bellOff,
         setHorn,
@@ -219,5 +252,7 @@ export const LegacySerialInterface = (
         decrementSpeed,
         startUpFast,
         shutDownFast,
+        startUpExt,
+        shutDownExt,
     }
 }

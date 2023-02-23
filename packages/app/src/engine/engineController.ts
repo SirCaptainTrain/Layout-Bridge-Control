@@ -23,6 +23,7 @@ export const EngineController = (): EngineController => {
         const engineDeviceId = engine.getEngineInfo().controlId
         console.log('E-STOP', engineId, engineDeviceId)
         const engineSerialInterface = engine.getEngineSerial().interface
+        const initialSpeed = engine.getSpeed()
         const timeoutRapidStop = () => {
             setTimeout(async () => {
                 if (engine.getSpeed() === 0) {
@@ -31,7 +32,20 @@ export const EngineController = (): EngineController => {
                     engine.setRapidStop(false)
                     return
                 }
-                engine.decrementSpeed()
+                // Scaling slow downof engines depending on initial speed at halt call
+                if (initialSpeed > 100) {
+                    engine.setSpeed(engine.getSpeed() - 20)
+                } else if (initialSpeed > 75) {
+                    engine.setSpeed(engine.getSpeed() - 10)
+                } else if (initialSpeed > 40) {
+                    engine.setSpeed(engine.getSpeed() - 8)
+                } else if (initialSpeed > 25) {
+                    engine.setSpeed(engine.getSpeed() - 5)
+                } else if (initialSpeed > 12) {
+                    engine.setSpeed(engine.getSpeed() - 3)
+                } else {
+                    engine.decrementSpeed()
+                }
                 engineSerialInterface.setSpeed(
                     engineDeviceId,
                     engine.getSpeed()

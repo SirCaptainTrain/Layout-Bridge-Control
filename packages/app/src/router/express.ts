@@ -29,7 +29,8 @@ export const Router = (
         console.log('Router middleware controller started')
     })
 
-    app.use(cors())
+    app.use(cors({ origin: true }))
+
     app.use(express.json())
 
     app.get('/engine/', (_req, res) => {
@@ -59,6 +60,7 @@ export const Router = (
 
         const newEngine = engineController.addEngine(controlPort, {
             id: v4(),
+            name: req.body.name,
             brand: req.body.brand,
             controlType: req.body.controlType,
             controlId: req.body.engineId,
@@ -122,26 +124,7 @@ export const Router = (
     app.get('/api/lionel/:engineModel', async (req, res) => {
         const engineModel = req.params.engineModel
         const axiosResponse = await axios.get(
-            `https://www.lionel.com/search?auto=${engineModel}&format=json`,
-            {
-                headers: {
-                    accept: '*/*',
-                    'accept-language': 'en-US,en;q=0.9',
-                    'if-modified-since': 'Thu, 16 Feb 2023 04:02:44 GMT',
-                    'sec-ch-ua':
-                        '"Chromium";v="110", "Not A(Brand";v="24", "Google Chrome";v="110"',
-                    'sec-ch-ua-mobile': '?0',
-                    'sec-ch-ua-platform': '"Windows"',
-                    'sec-fetch-dest': 'empty',
-                    'sec-fetch-mode': 'cors',
-                    'sec-fetch-site': 'same-origin',
-                    'x-requested-with': 'XMLHttpRequest',
-                    cookie: 'cp_sessionid=8575379551937405',
-                    Referer:
-                        'https://www.lionel.com/products/milwaukee-road-legacy-scale-heavy-mikado-2-8-2-steam-locomotive-8693-6-81038',
-                    'Referrer-Policy': 'strict-origin-when-cross-origin',
-                },
-            }
+            `https://www.lionel.com/search?auto=${engineModel}&format=json`
         )
 
         if (
@@ -234,8 +217,10 @@ export const Router = (
 
 const mapEngine = (engine: Engine) => {
     const engineInfo: any = engine.getEngineInfo()
+    engineInfo.name = engine.getName()
     engineInfo.currentSpeed = engine.getSpeed()
     engineInfo.maxSpeed = engine.getMaxSpeed()
+    engineInfo.speedControlType = engine.getSpeedControlType()
     engineInfo.path = engine.getEngineSerial().serial.port.path
     return engineInfo
 }

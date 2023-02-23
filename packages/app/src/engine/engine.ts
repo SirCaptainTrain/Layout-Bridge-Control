@@ -1,4 +1,4 @@
-import { ControlType, EngineInfo } from './enginetypes'
+import { EngineInfo, EngineSpeedControlType } from './enginetypes'
 import dotenv from 'dotenv'
 import { ControlPort } from '../serial/serialController'
 import { getControlTypeMaxSpeed, getWhistleStepsMax } from './engineUtil'
@@ -18,11 +18,13 @@ export type Engine = {
     resetSpeed: () => void
     setBell: (active: boolean) => void
     getId: () => string
-    getName: () => string
+    getName?: () => string | null
     getSpeed: () => number
     getMaxSpeed: () => number
     getBell: () => boolean
     getWhistleSteps: () => number
+    getSpeedControlType: () => EngineSpeedControlType
+    setSpeedControlType: (type: EngineSpeedControlType) => void
 }
 
 export const Engine = (
@@ -33,6 +35,8 @@ export const Engine = (
     let engineInfo = initialEngineInfo
 
     let engineRapidStopActive = false
+
+    let speedControlType = EngineSpeedControlType.ABS
 
     // Legacy Bell on/off toggle
     let bellStatus = false
@@ -125,7 +129,7 @@ export const Engine = (
     }
 
     const getName = () => {
-        return engineInfo.name ?? engineInfo.model
+        return engineInfo.name ?? engineInfo.model ?? null
     }
 
     const getSpeed = () => {
@@ -147,6 +151,14 @@ export const Engine = (
         return getControlTypeMaxSpeed(engineInfo.controlType)
     }
 
+    const getSpeedControlType = () => {
+        return speedControlType
+    }
+
+    const setSpeedControlType = (type: EngineSpeedControlType) => {
+        speedControlType = type
+    }
+
     return {
         getEngineSerial,
         getEngineInfo,
@@ -164,5 +176,7 @@ export const Engine = (
         getMaxSpeed,
         getBell,
         getWhistleSteps,
+        getSpeedControlType,
+        setSpeedControlType,
     }
 }

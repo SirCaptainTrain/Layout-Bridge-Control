@@ -1,5 +1,6 @@
 import { Engine } from '../engine/engine'
 import { EngineController } from '../engine/engineController'
+import { EngineSpeedControlType } from '../engine/enginetypes'
 import { SerialController } from '../serial/serialController'
 
 export const Control = (
@@ -25,7 +26,11 @@ export const Control = (
 
             const engineInfo = currentEngine.getEngineInfo()
             const engineInterface = currentEngine.getEngineSerial().interface
-            //console.log('level', whistleLevel)
+
+            if (engineInterface.setHorn == null) {
+                return
+            }
+
             if (
                 engineInfo.controlType === 'LEGACY' ||
                 engineInfo.controlType === 'MTH'
@@ -48,6 +53,44 @@ export const Control = (
 
     const startProcessing = async () => {
         controlLoop()
+    }
+
+    const setEngine = (engineId: string) => {
+        const engine = engineController.getEngine(engineId)
+        if (engine == null) {
+            throw new Error('Invalid Engine')
+        }
+        currentEngine = engine
+    }
+
+    const setSpeed = (speed: string | number) => {
+        if (currentEngine == null) {
+            return
+        }
+
+        const engineInfo = currentEngine.getEngineInfo()
+        const engineInterface = currentEngine.getEngineSerial().interface
+
+        if (engineInterface.setSpeed == null) {
+            return
+        }
+
+        if (typeof speed === 'string') {
+            speed = parseInt(speed)
+        }
+
+        if (isNaN(speed)) {
+            throw new Error('Invalid speed')
+        }
+        engineController.getEngine(engineInfo.id).setSpeed(speed)
+        engineInterface.setSpeed(engineInfo.controlId, speed)
+    }
+
+    const haltEngine = () => {
+        if (currentEngine == null) {
+            return
+        }
+        engineController.rapidStop(currentEngine)
     }
 
     const setTMCCWhistle = (active: boolean) => {
@@ -79,6 +122,10 @@ export const Control = (
         const engineInfo = currentEngine.getEngineInfo()
         const engineInterface = currentEngine.getEngineSerial().interface
 
+        if (engineInterface.bellOn == null) {
+            return
+        }
+
         engineInterface.bellOn(engineInfo.controlId)
     }
 
@@ -90,15 +137,41 @@ export const Control = (
         const engineInfo = currentEngine.getEngineInfo()
         const engineInterface = currentEngine.getEngineSerial().interface
 
+        if (engineInterface.bellOff == null) {
+            return
+        }
+
         engineInterface.bellOff(engineInfo.controlId)
     }
 
-    const setEngine = (engineId: string) => {
-        const engine = engineController.getEngine(engineId)
-        if (engine == null) {
-            throw new Error('Invalid Engine')
+    const forwardDirection = () => {
+        if (currentEngine == null) {
+            return
         }
-        currentEngine = engine
+
+        const engineInfo = currentEngine.getEngineInfo()
+        const engineInterface = currentEngine.getEngineSerial().interface
+
+        if (engineInterface.setDirectionForward == null) {
+            return
+        }
+
+        engineInterface.setDirectionForward(engineInfo.controlId)
+    }
+
+    const backwardDirection = () => {
+        if (currentEngine == null) {
+            return
+        }
+
+        const engineInfo = currentEngine.getEngineInfo()
+        const engineInterface = currentEngine.getEngineSerial().interface
+
+        if (engineInterface.setDirectionBackward == null) {
+            return
+        }
+
+        engineInterface.setDirectionBackward(engineInfo.controlId)
     }
 
     const toggleDirection = () => {
@@ -108,6 +181,10 @@ export const Control = (
 
         const engineInfo = currentEngine.getEngineInfo()
         const engineInterface = currentEngine.getEngineSerial().interface
+
+        if (engineInterface.toggleDirection == null) {
+            return
+        }
 
         engineInterface.toggleDirection(engineInfo.controlId)
     }
@@ -120,6 +197,10 @@ export const Control = (
         const engineInfo = currentEngine.getEngineInfo()
         const engineInterface = currentEngine.getEngineSerial().interface
 
+        if (engineInterface.incrementSpeed == null) {
+            return
+        }
+
         engineInterface.incrementSpeed(engineInfo.controlId)
     }
 
@@ -130,6 +211,10 @@ export const Control = (
 
         const engineInfo = currentEngine.getEngineInfo()
         const engineInterface = currentEngine.getEngineSerial().interface
+
+        if (engineInterface.decrementSpeed == null) {
+            return
+        }
 
         engineInterface.decrementSpeed(engineInfo.controlId)
     }
@@ -142,6 +227,10 @@ export const Control = (
         const engineInfo = currentEngine.getEngineInfo()
         const engineInterface = currentEngine.getEngineSerial().interface
 
+        if (engineInterface.startUpFast == null) {
+            return
+        }
+
         engineInterface.startUpFast(engineInfo.controlId)
     }
 
@@ -153,6 +242,10 @@ export const Control = (
         const engineInfo = currentEngine.getEngineInfo()
         const engineInterface = currentEngine.getEngineSerial().interface
 
+        if (engineInterface.shutDownFast == null) {
+            return
+        }
+
         engineInterface.shutDownFast(engineInfo.controlId)
     }
 
@@ -160,17 +253,38 @@ export const Control = (
 
     const shutDownExt = () => {}
 
+    const setSpeedType = (speedType: number) => {
+        if (currentEngine == null) {
+            return
+        }
+
+        if (speedType === EngineSpeedControlType.ABS) {
+            currentEngine.setSpeedControlType(EngineSpeedControlType.ABS)
+        } else if (speedType === EngineSpeedControlType.REL) {
+            currentEngine.setSpeedControlType(EngineSpeedControlType.REL)
+        } else {
+            throw new Error('Invalid speed type')
+        }
+    }
+
     return {
         startProcessing,
+        setEngine,
+        setSpeed,
+        haltEngine,
         setWhistle,
         setTMCCWhistle,
         bellOn,
         bellOff,
-        setEngine,
+        forwardDirection,
+        backwardDirection,
         toggleDirection,
         incrementSpeed,
         decrementSpeed,
         startUpFast,
         shutDownFast,
+        startUpExt,
+        shutDownExt,
+        setSpeedType,
     }
 }
