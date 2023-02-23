@@ -18,7 +18,7 @@ export const routerMiddleware = (req, res, next) => {
                 break
             }
             case 'whistle': {
-                control.setWhistle(req.body.whistle)
+                control.setWhistle(req.body.whistleLevel)
                 break
             }
             case 'tmccWhistle': {
@@ -55,6 +55,30 @@ export const routerMiddleware = (req, res, next) => {
             }
             case 'shutDownFast': {
                 control.shutDownFast()
+                break
+            }
+            case 'startUpExt': {
+                control.startUpExt()
+                break
+            }
+            case 'shutDownExt': {
+                control.shutDownExt()
+                break
+            }
+            case 'couplerFront': {
+                control.openCouplerForward()
+                break
+            }
+            case 'couplerRear': {
+                control.openCouplerRear()
+                break
+            }
+            case 'speedType': {
+                control.setSpeedType(req.body.speedType)
+                break
+            }
+            case 'halt': {
+                control.haltEngine()
                 break
             }
         }

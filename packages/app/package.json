@@ -1,6 +1,6 @@
 {
     "name": "lbc-app",
-    "version": "0.0.3-alpha",
+    "version": "0.1.0-alpha",
     "license": "MIT",
     "scripts": {
         "build": "yarn tsc",

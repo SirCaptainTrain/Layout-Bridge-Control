@@ -8,3 +8,8 @@ export type EngineInfo = {
     controlType: ControlType
     controlId?: string | number
 }
+
+export enum EngineSpeedControlType {
+    ABS,
+    REL,
+}
