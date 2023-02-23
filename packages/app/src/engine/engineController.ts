@@ -13,14 +13,10 @@ export type EngineController = {
     addEngine: (controlPort: ControlPort, engineInfo: EngineInfo) => Engine
     updateEngine: (engineId: string, engineInfo: EngineInfo) => void
     removeEngine: (engineId: string) => void
-    getActiveEngine?: () => Engine | null
-    setActiveEngine: (engineId: string) => void
-    unsetActiveEngine: () => void
 }
 
 export const EngineController = (): EngineController => {
     let engines: Engine[] = []
-    let activeEngine: Engine | null = null
 
     const rapidStop = (engine: Engine) => {
         const engineId = engine.getId()
@@ -80,23 +76,6 @@ export const EngineController = (): EngineController => {
         engines[engineIndex].setEngineInfo(engineInfo)
     }
 
-    const getActiveEngine = (): Engine | null => {
-        return activeEngine
-    }
-
-    const setActiveEngine = (engineId: string) => {
-        const newEngine = engines.find((engine) => engine.getId() === engineId)
-        if (newEngine == null) {
-            throw new Error('Invalid new engine')
-        }
-        console.log({ activeEngine: newEngine.getId() })
-        activeEngine = newEngine
-    }
-
-    const unsetActiveEngine = () => {
-        activeEngine = null
-    }
-
     return {
         rapidStop,
         getEngine,
@@ -104,8 +83,5 @@ export const EngineController = (): EngineController => {
         addEngine,
         updateEngine,
         removeEngine,
-        getActiveEngine,
-        setActiveEngine,
-        unsetActiveEngine,
     }
 }

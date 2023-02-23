@@ -323,7 +323,6 @@
     let selectedSerial = null
 
     let activePorts = []
-    let activeEngines = []
     const engines = []
 
     const axiosGet = async (path) => {
@@ -430,7 +429,6 @@
 
     const getEngineList = async () => {
         const enginesRes = await axiosGet('/engine')
-        const activeEngineRes = await axiosGet('/engine/active')
 
         $('#engine-rows').empty()
 
@@ -438,25 +436,12 @@
             throw new Error("Invalid engine types")
         }
 
-        activeEngines = []
-        if (activeEngineRes.data != null && activeEngineRes.data.length > 0) {
-            for (const activeEngine of activeEngineRes.data) {
-                activeEngines.push(activeEngine)
-            }
-        }
-
         if (enginesRes.data.length === 0) {
             return
         }
 
         for (let engine of enginesRes.data) {
-            const match = activeEngines.find((activeEngine) => activeEngine.id === engine.id)
-            if (match != null) {
-                engine.active = true
-                addEngine(engine, true)
-            } else {
-                addEngine(engine)
-            }
+            addEngine(engine)
         }
     }
 

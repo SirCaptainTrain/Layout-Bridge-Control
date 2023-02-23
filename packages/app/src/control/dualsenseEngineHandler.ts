@@ -1,11 +1,8 @@
 import { Engine } from '../engine/engine'
 import { EngineController } from '../engine/engineController'
-import { SerialController } from '../serial/serialController'
 
-export const DualsenseEngineHandler = (
-    engineController: EngineController,
-    serialController: SerialController
-) => {
+export const DualsenseEngineHandler = (engineController: EngineController) => {
+    let activeEngine: Engine | undefined = null
     let leftTriggerActive = false
     let rightTriggerActive = false
 
@@ -18,7 +15,6 @@ export const DualsenseEngineHandler = (
     let analogRightNegativeValue = null
 
     const handleRapidStop = () => {
-        const activeEngine = engineController.getActiveEngine()
         if (activeEngine == null) {
             return
         }
@@ -38,7 +34,6 @@ export const DualsenseEngineHandler = (
     }
 
     const engineControlLoop = async () => {
-        const activeEngine = engineController.getActiveEngine()
         if (activeEngine == null) {
             return
         }
@@ -113,7 +108,6 @@ export const DualsenseEngineHandler = (
     }
 
     const handleLeftBumper = async (active: boolean) => {
-        const activeEngine = engineController.getActiveEngine()
         if (activeEngine == null) {
             return
         }
@@ -130,7 +124,6 @@ export const DualsenseEngineHandler = (
     }
 
     const handleRightBumper = async (active: boolean) => {
-        const activeEngine = engineController.getActiveEngine()
         if (activeEngine == null) {
             return
         }
@@ -148,7 +141,7 @@ export const DualsenseEngineHandler = (
         const engines = engineController.getEngines()
 
         if (engines.length === 0) {
-            engineController.unsetActiveEngine()
+            activeEngine = null
             return
         }
 
@@ -158,19 +151,17 @@ export const DualsenseEngineHandler = (
 
         const activeIndex = getActiveIndex()
         if (engines[activeIndex - 1] == null) {
-            engineController.setActiveEngine(
-                engines[engines.length - 1].getId()
-            )
+            activeEngine = engines[engines.length - 1]
             return
         }
-        engineController.setActiveEngine(engines[activeIndex - 1].getId())
+        activeEngine = engines[activeIndex - 1]
     }
 
     const handleDpadRight = () => {
         const engines = engineController.getEngines()
 
         if (engines.length === 0) {
-            engineController.unsetActiveEngine()
+            activeEngine = null
             return
         }
 
@@ -180,15 +171,14 @@ export const DualsenseEngineHandler = (
 
         const activeIndex = getActiveIndex()
         if (engines[activeIndex + 1] == null) {
-            engineController.setActiveEngine(engines[0].getId())
+            activeEngine = engines[0]
             return
         }
-        engineController.setActiveEngine(engines[activeIndex + 1].getId())
+        activeEngine = engines[activeIndex + 1]
     }
 
     const handleTriangle = () => {
-        const activeEngine = engineController.getActiveEngine()
-        if (engineController.getActiveEngine() == null) {
+        if (activeEngine == null) {
             return
         }
 
@@ -198,8 +188,7 @@ export const DualsenseEngineHandler = (
     }
 
     const handleSquare = () => {
-        const activeEngine = engineController.getActiveEngine()
-        if (engineController.getActiveEngine() == null) {
+        if (activeEngine == null) {
             return
         }
 
@@ -226,7 +215,7 @@ export const DualsenseEngineHandler = (
     }
 
     const handleAnalogRightPositive = async (axisValue: number) => {
-        if (engineController.getActiveEngine() == null) {
+        if (activeEngine == null) {
             return
         }
         if (analogRightPositiveActive) {
@@ -237,7 +226,7 @@ export const DualsenseEngineHandler = (
     }
 
     const handleAnalogRightNegative = async (axisValue: number) => {
-        if (engineController.getActiveEngine() == null) {
+        if (activeEngine == null) {
             return
         }
         if (analogRightNegativeActive && axisValue > -0.15) {
@@ -263,8 +252,7 @@ export const DualsenseEngineHandler = (
     }
 
     const handleCircle = (active: boolean) => {
-        const activeEngine = engineController.getActiveEngine()
-        if (engineController.getActiveEngine() == null) {
+        if (activeEngine == null) {
             return
         }
 
@@ -281,36 +269,33 @@ export const DualsenseEngineHandler = (
     const handleCross = (active: boolean) => {}
 
     const validateActiveEngine = () => {
-        console.log('active', engineController.getActiveEngine()?.getId())
-        if (engineController.getActiveEngine() === null) {
+        console.log('active', activeEngine?.getId())
+        if (activeEngine === null) {
             if (engineController.getEngines().length === 0) {
                 return false
             }
-            engineController.setActiveEngine(
-                engineController.getEngines()[0].getId()
-            )
+            activeEngine = engineController.getEngines()[0]
             return false
         }
         if (engineController.getEngines().length === 1) {
             if (
-                engineController.getActiveEngine().getId() !==
+                activeEngine.getId() !==
                 engineController.getEngines()[0].getId()
             ) {
-                engineController.setActiveEngine(
-                    engineController.getEngines()[0].getId()
-                )
+                activeEngine = engineController.getEngines()[0]
                 return false
             }
         }
         return true
     }
 
+    const setActiveEngine = (engine: Engine) => {
+        activeEngine = engine
+    }
+
     const getActiveIndex = () => {
-        const activeEngine = engineController.getActiveEngine()
         if (activeEngine == null) {
-            engineController.setActiveEngine(
-                engineController.getEngines()[0].getId()
-            )
+            activeEngine = engineController.getEngines()[0]
             getActiveIndex()
         }
 
@@ -339,5 +324,6 @@ export const DualsenseEngineHandler = (
         handleCross,
         handleAnalogRightPositive,
         handleAnalogRightNegative,
+        setActiveEngine,
     }
 }
