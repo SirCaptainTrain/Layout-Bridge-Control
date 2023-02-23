@@ -71,14 +71,6 @@ export const Router = (
         res.send({ ...newEngine.getEngineInfo(), path: req.body.com })
     })
 
-    app.get('/engine/active', (_req, res) => {
-        if (engineController.getActiveEngine() == null) {
-            return res.sendStatus(204)
-        }
-
-        res.send(mapEngine(engineController.getActiveEngine()))
-    })
-
     app.get('/engine/:id', (req, res) => {
         const engine = engineController.getEngine(req.params.id)
         if (engine == null) {

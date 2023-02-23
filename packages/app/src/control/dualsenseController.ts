@@ -28,10 +28,7 @@ export const DualsenseController = (
     serialController: SerialController,
     errorCallback: (type: 'error' | 'fatal', message: string) => void
 ): DualsenseController => {
-    const dualsenseEngineHandler = DualsenseEngineHandler(
-        engineController,
-        serialController
-    )
+    const dualsenseEngineHandler = DualsenseEngineHandler(engineController)
     const dualsenseMenuHandler = DualsenseMenuHandler(serialController)
     let controller: Dualsense | null = null
     let engineControlInterval = null
@@ -238,7 +235,7 @@ export const DualsenseController = (
                     controlType: 'LEGACY',
                     controlId: 3,
                 })
-                engineController.setActiveEngine(newEngine.getId())
+                dualsenseEngineHandler.setActiveEngine(newEngine)
             }
         })
 

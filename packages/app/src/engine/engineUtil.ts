@@ -3,7 +3,7 @@ import { ControlType } from './enginetypes'
 export const getControlTypeMaxSpeed = (controlType: ControlType) => {
     switch (controlType) {
         case 'LEGACY': {
-            return 127
+            return 199
         }
         case 'ERR': {
             return 99
