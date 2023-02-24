@@ -18,6 +18,8 @@
 
 ### Setup
 
+Clone the repository
+
 This repo uses yarn v1 for package management. Install it globally with `npm install -g yarn`
 
 Run `yarn install` in the root of the repo after cloning to install required packages
@@ -26,7 +28,7 @@ Run `yarn install` in the root of the repo after cloning to install required pac
 ## Running
 
 This repo uses yarn workspaces for targeting scripts + packages.
-To run the app, run the following in `2` seperate terminals
+To run the app, run the following in `2` seperate terminals in the root of the repo
 
 - yarn workspace app run
 - yarn workspace web run
