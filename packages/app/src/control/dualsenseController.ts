@@ -55,8 +55,6 @@ export const DualsenseController = (
         clearInterval(engineControlInterval)
         engineControlInterval = null
         connected = false
-
-        removeAllListeners()
     }
 
     const addControllerCallback = () => {

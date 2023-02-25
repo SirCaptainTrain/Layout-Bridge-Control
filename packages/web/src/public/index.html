@@ -562,7 +562,6 @@
 
         $('body').on('click', '#engine-rows tr', async function () {
             const engineId = $(this).data('id')
-            await axiosPost('/engine/control', { type: 'engine', engineId })
             selectedEngine = engineId
             $('#selected-engine').html(`Selected engine: ${engineId}`).toggleClass('d-none', false)
             setEngineButtonsActive(true)
@@ -694,7 +693,7 @@
         $('#engine-control-speed-select').on('change', async function () {
             if (selectedEngine == null) return
             const speedType = $('#engine-control-speed-select').val() === "abs" ? 0 : 1
-            await axiosPost('/engine/control', { type: 'speedType', speedType })
+            await axiosPost('/engine/control', { engineId: selectedEngine, type: 'speedType', speedType })
             await getEngineList()
             const engineInfo = engines.find((engine) => engine.id === selectedEngine)
             console.log(engineInfo)
@@ -705,71 +704,71 @@
             //console.log($('#engine-control-whistle-slider').val())
             const whistleLevel = parseInt($('#engine-control-whistle-slider').val())
             if (isNaN(whistleLevel)) return
-            await axiosPost('/engine/control', { type: 'whistle', whistleLevel })
+            await axiosPost('/engine/control', { engineId: selectedEngine, type: 'whistle', whistleLevel })
             $('#engine-control-whistle').html(whistleLevel)
         })
 
         $('#engine-current-speed-slider').on('input', async function () {
             const speed = $('#engine-current-speed-slider').val()
-            await axiosPost('/engine/control', { type: 'setSpeed', speed })
+            await axiosPost('/engine/control', { engineId: selectedEngine, type: 'setSpeed', speed })
             $('#engine-current-speed').html($('#engine-current-speed-slider').val())
         })
 
         $('#engine-control-whistle-slider').on('change', async function () {
             await sleep(25)
             $('#engine-control-whistle-slider').val("0")
-            await axiosPost('/engine/control', { type: 'whistle', whistleLevel: 0 })
+            await axiosPost('/engine/control', { engineId: selectedEngine, type: 'whistle', whistleLevel: 0 })
             $('#engine-control-whistle').html(0)
         })
 
         $('#engine-control-bell-on').click(async function () {
             if (selectedEngine == null) return
-            await axiosPost('/engine/control', { type: 'bellOn' })
+            await axiosPost('/engine/control', { engineId: selectedEngine, type: 'bellOn' })
         })
 
         $('#engine-control-bell-off').click(async function () {
             if (selectedEngine == null) return
-            await axiosPost('/engine/control', { type: 'bellOff' })
+            await axiosPost('/engine/control', { engineId: selectedEngine, type: 'bellOff' })
         })
 
         $('#engine-control-power-on').click(async function () {
             if (selectedEngine == null) return
-            await axiosPost('/engine/control', { type: 'startUpFast' })
+            await axiosPost('/engine/control', { engineId: selectedEngine, type: 'startUpFast' })
         })
 
         $('#engine-control-power-off').click(async function () {
             if (selectedEngine == null) return
-            await axiosPost('/engine/control', { type: 'shutDownFast' })
+            await axiosPost('/engine/control', { engineId: selectedEngine, type: 'shutDownFast' })
         })
 
         $('#engine-control-rel-plus-1').click(async function () {
             if (selectedEngine == null) return
-            await axiosPost('/engine/control', { type: 'incrementSpeed' })
+            await axiosPost('/engine/control', { engineId: selectedEngine, type: 'incrementSpeed' })
         })
 
         $('#engine-control-rel-minus-1').click(async function () {
             if (selectedEngine == null) return
-            await axiosPost('/engine/control', { type: 'decrementSpeed' })
+            await axiosPost('/engine/control', { engineId: selectedEngine, type: 'decrementSpeed' })
         })
 
         $('#engine-control-direction-forward').click(async function () {
             if (selectedEngine == null) return
-            await axiosPost('/engine/control', { type: 'forwardDirection' })
+            await axiosPost('/engine/control', { engineId: selectedEngine, type: 'forwardDirection' })
         })
 
         $('#engine-control-direction-toggle').click(async function () {
             if (selectedEngine == null) return
-            await axiosPost('/engine/control', { type: 'toggleDirection' })
+            await axiosPost('/engine/control', { engineId: selectedEngine, type: 'toggleDirection' })
         })
 
         $('#engine-control-direction-backward').click(async function () {
             if (selectedEngine == null) return
-            await axiosPost('/engine/control', { type: 'backwardDirection' })
+            await axiosPost('/engine/control', { engineId: selectedEngine, type: 'backwardDirection' })
         })
 
         $('#engine-control-halt').click(async function () {
             if (selectedEngine == null) return
-            await axiosPost('/engine/control', { type: 'halt' })
+            await axiosPost('/engine/control', { engineId: selectedEngine, type: 'halt' })
 
             let currentSpeed = parseInt($('#engine-current-speed-slider').val())
             if (isNaN(currentSpeed)) return

@@ -1,9 +1,12 @@
 import dotenv from 'dotenv'
 import { DualsenseController } from './control/dualsenseController'
 import { EngineController } from './engine/engineController'
-import { Router } from './router/express'
+import { Router } from './router/router'
 import { SerialController } from './serial/serialController'
 import { SocketController } from './socket/socketController'
+
+console.clear()
+console.log('LBC App Starting')
 
 dotenv.config()
 const APP_DEBUG = process.env.APP_DEBUG === 'true'
