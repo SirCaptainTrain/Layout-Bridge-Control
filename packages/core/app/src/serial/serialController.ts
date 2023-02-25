@@ -175,7 +175,6 @@ export const SerialController = (
         newPort.on('close', async () => {
             await database.removeSerial(availablePort.serialNumber)
             console.log('PORT CLOSED', newPort.path)
-            console.log(newPort.listeners('close'))
         })
 
         newPort.on('error', async (err) => {
