@@ -4,10 +4,12 @@
     "license": "MIT",
     "private": true,
     "workspaces": [
-        "packages/app",
-        "packages/web"
+        "packages/core/app",
+        "packages/controllers/dualsense",
+        "packages/controllers/web"
     ],
     "devDependencies": {
         "typescript": "^4.9.5"
-    }
+    },
+    "packageManager": "yarn@3.4.1"
 }
