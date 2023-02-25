@@ -3,3 +3,4 @@ dist
 node_modules
 app.settings.json
 .env
+lbc.db

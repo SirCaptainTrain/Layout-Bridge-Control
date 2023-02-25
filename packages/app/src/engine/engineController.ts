@@ -2,6 +2,7 @@ import { Engine } from './engine'
 import { EngineInfo } from './enginetypes'
 import dotenv from 'dotenv'
 import { ControlPort } from '../serial/serialController'
+import { LBCDatabase } from '../database/database'
 
 dotenv.config()
 const APP_DEBUG = process.env.APP_DEBUG === 'true'
@@ -10,12 +11,16 @@ export type EngineController = {
     rapidStop: (engine: Engine) => void
     getEngine: (engineId: string) => Engine | null
     getEngines: () => Engine[]
-    addEngine: (controlPort: ControlPort, engineInfo: EngineInfo) => Engine
+    addEngine: (
+        controlPort: ControlPort,
+        engineInfo: EngineInfo,
+        dbInsert?: boolean
+    ) => Promise<Engine>
     updateEngine: (engineId: string, engineInfo: EngineInfo) => void
     removeEngine: (engineId: string) => void
 }
 
-export const EngineController = (): EngineController => {
+export const EngineController = (database: LBCDatabase): EngineController => {
     let engines: Engine[] = []
 
     const rapidStop = (engine: Engine) => {
@@ -64,9 +69,20 @@ export const EngineController = (): EngineController => {
         return engines
     }
 
-    const addEngine = (controlPort: ControlPort, engineInfo: EngineInfo) => {
+    const addEngine = async (
+        controlPort: ControlPort,
+        engineInfo: EngineInfo,
+        dbInsert: boolean = true
+    ) => {
         const engine = Engine(controlPort, engineInfo)
         engines.push(engine)
+        if (dbInsert) {
+            const engines = await database.getEngineList()
+            if (!engines.find((dbEngine) => dbEngine.id === engine.getId())) {
+                console.log(`Adding ${engine.getId()} to database`)
+                await database.addEngine(engine)
+            }
+        }
         return engine
     }
 

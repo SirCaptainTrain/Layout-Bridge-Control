@@ -227,12 +227,15 @@ export const DualsenseController = (
                 if (controlPorts == null) {
                     return
                 }
-                const newEngine = engineController.addEngine(controlPorts, {
-                    id: v4(),
-                    brand: 'Lionel',
-                    controlType: 'LEGACY',
-                    controlId: 3,
-                })
+                const newEngine = await engineController.addEngine(
+                    controlPorts,
+                    {
+                        id: v4(),
+                        brand: 'Lionel',
+                        controlType: 'LEGACY',
+                        controlId: 3,
+                    }
+                )
                 dualsenseEngineHandler.setActiveEngine(newEngine)
             }
         })

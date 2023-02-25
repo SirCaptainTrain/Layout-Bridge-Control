@@ -5,6 +5,7 @@ import { SerialControlInterface } from './serialTypes'
 import { TMCCSerialInterface } from './tmcc/tmccSerialInterface'
 import { LegacySerialInterface } from './legacy/legacySerialInterface'
 import { PortInfo } from '@serialport/bindings-interface'
+import { LBCDatabase } from '../database/database'
 
 dotenv.config()
 const SERIAL_DEBUG = process.env.SERIAL_DEBUG === 'true'
@@ -59,7 +60,7 @@ type ClosePortOptions = {
     port?: ControlPort
 }
 
-export const SerialController = (): SerialController => {
+export const SerialController = (database: LBCDatabase): SerialController => {
     // SerialPort doesn't correctly export PortInfo[]
     let availablePorts: AvailablePort[] = []
     let activePorts: ControlPort[] = []
@@ -74,7 +75,6 @@ export const SerialController = (): SerialController => {
         availablePorts = ports
             .filter((port) => port.path !== 'COM1')
             .map((port: any) => {
-                console.log('name', port.friendlyName)
                 return {
                     name: port.friendlyName,
                     serialNumber: port.serialNumber,
@@ -138,7 +138,7 @@ export const SerialController = (): SerialController => {
             serialNumber: availablePort.serialNumber,
             name: availablePort.name,
         }
-        newPort.on('open', () => {
+        newPort.on('open', async () => {
             const id = v4()
             activePorts.push({
                 id,
@@ -146,17 +146,27 @@ export const SerialController = (): SerialController => {
                 type: type,
                 interface: portInterface,
             })
+            const dbSerials = await database.getSerialList()
+            if (
+                !dbSerials.find(
+                    (dbSerial) =>
+                        dbSerial.serialNumber === availablePort.serialNumber
+                )
+            ) {
+                await database.addSerial(availablePort.serialNumber, type)
+            }
+
             commandLoopInterval = setInterval(commandLoop, 100)
             console.log('ControlPort opened to', newPort.path)
-            console.log(
-                'Open ports',
-                activePorts.map((activePort) => {
-                    return {
-                        id: activePort.id,
-                        path: activePort.serial.port.path,
-                    }
-                })
-            )
+            // console.log(
+            //     'Open ports',
+            //     activePorts.map((activePort) => {
+            //         return {
+            //             id: activePort.id,
+            //             path: activePort.serial.port.path,
+            //         }
+            //     })
+            // )
         })
 
         newPort.on('data', (chunk: Buffer) => {
@@ -164,7 +174,8 @@ export const SerialController = (): SerialController => {
             processChunk(type, chunk)
         })
 
-        newPort.on('close', () => {
+        newPort.on('close', async () => {
+            await database.removeSerial(availablePort.serialNumber)
             console.log('PORT CLOSED', newPort.path)
         })
     }
@@ -188,12 +199,12 @@ export const SerialController = (): SerialController => {
             )
             closePort(activePorts[activeSerial], errorCallback)
             activePorts = activePorts.slice(activeSerial)
-            console.log(
-                'Open ports',
-                activePorts.map((port) => {
-                    return { id: port.id, path: port.serial.port.path }
-                })
-            )
+            // console.log(
+            //     'Open ports',
+            //     activePorts.map((port) => {
+            //         return { id: port.id, path: port.serial.port.path }
+            //     })
+            // )
         } else if (options.path) {
             console.log('port close by path')
             if (
