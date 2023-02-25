@@ -30,8 +30,8 @@ Run `yarn install` in the root of the repo after cloning to install required pac
 This repo uses yarn workspaces for targeting scripts + packages.
 To run the app, run the following in `2` seperate terminals in the root of the repo
 
-- yarn workspace app run
-- yarn workspace web run
+- yarn workspace lbc-app dev
+- yarn workspace lbc-web dev
 
 After starting both apps, open a browser at http://localhost:3002 to start configuring
 
