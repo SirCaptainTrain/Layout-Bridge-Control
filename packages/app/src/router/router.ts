@@ -36,7 +36,7 @@ export const Router = (
         )
     })
 
-    app.post('/engine/add', (req, res) => {
+    app.post('/engine/add', async (req, res) => {
         if (
             req.body.engineId == null ||
             req.body.com == null ||
@@ -53,7 +53,7 @@ export const Router = (
             return res.sendStatus(400)
         }
 
-        const newEngine = engineController.addEngine(controlPort, {
+        const newEngine = await engineController.addEngine(controlPort, {
             id: v4(),
             name: req.body.name,
             brand: req.body.brand,
