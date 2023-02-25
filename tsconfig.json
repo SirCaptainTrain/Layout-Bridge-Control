@@ -3,8 +3,10 @@
     "target": "es2022",
     "module": "commonjs",
     "moduleResolution": "node",
-    "outDir": "dist",
-    "esModuleInterop": true,                             
+    "composite": true,
+    "incremental": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,                           
     "forceConsistentCasingInFileNames": true,
     "strict": false,
     "skipLibCheck": true
