@@ -269,6 +269,32 @@ export const Control = (engineController: EngineController) => {
         }
     }
 
+    const openCouplerForward = (engineId: string) => {
+        const currentEngine = getReqEngine(engineId)
+
+        const engineInfo = currentEngine.getEngineInfo()
+        const engineInterface = currentEngine.getEngineSerial().interface
+
+        if (engineInterface.shutDownFast == null) {
+            return
+        }
+
+        engineInterface.openCouplerForward(engineInfo.controlId)
+    }
+
+    const openCouplerRear = (engineId: string) => {
+        const currentEngine = getReqEngine(engineId)
+
+        const engineInfo = currentEngine.getEngineInfo()
+        const engineInterface = currentEngine.getEngineSerial().interface
+
+        if (engineInterface.shutDownFast == null) {
+            return
+        }
+
+        engineInterface.openCouplerRear(engineInfo.controlId)
+    }
+
     const getReqEngine = (engineId: string) => {
         const engine = engineController
             .getEngines()
@@ -299,5 +325,7 @@ export const Control = (engineController: EngineController) => {
         startUpExt,
         shutDownExt,
         setSpeedType,
+        openCouplerForward,
+        openCouplerRear,
     }
 }

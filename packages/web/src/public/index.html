@@ -276,14 +276,19 @@
                             <label for="engine-control-speed" class="form-label">Speed (<span
                                     id="engine-current-speed"></span>/<span id="engine-max-speed"></span>)</label>
                             <input type="range" class="form-range" min="0" max="0" id="engine-current-speed-slider"
-                                value="0" id="engine-control-whistle">
+                                value="0">
+                            <div class="mt-2">
+                                <button class="btn btn-success" id="engine-control-abs-plus-1">Increase +1</button>
+                                <button class="btn btn-danger" id="engine-control-abs-minus-1">Decrease -1</button>
+                            </div>
                         </div>
                         <div class="mb-3 d-none" id="engine-control-rel-speed">
                             <button class="btn btn-success" id="engine-control-rel-plus-1">Increase +1</button>
                             <button class="btn btn-danger" id="engine-control-rel-minus-1">Decrease -1</button>
                         </div>
                         <div class="mt-2">
-                            <button class="btn btn-danger" id="engine-control-halt">HALT</button>
+                            <button class="btn btn-danger" id="engine-control-halt"><i
+                                    class="fas fa-triangle-exclamation"></i> HALT</button>
                         </div>
                         <hr class="lead" />
                         <div class="mb-3 d-none" id="engine-control-whistle-slider-view">
@@ -762,6 +767,34 @@
             await axiosPost('/engine/control', { engineId: selectedEngine, type: 'decrementSpeed' })
         })
 
+        $('#engine-control-abs-plus-1').click(async function () {
+            if (selectedEngine == null) return
+            let speed = parseInt($('#engine-current-speed-slider').val())
+            if (isNaN(speed)) return
+            const max = parseInt($('#engine-current-speed-slider').attr('max'))
+            if (speed >= max) {
+                return
+            }
+            speed++
+            await axiosPost('/engine/control', { engineId: selectedEngine, type: 'setSpeed', speed })
+            $('#engine-current-speed-slider').val(speed)
+            $('#engine-current-speed').html($('#engine-current-speed-slider').val())
+        })
+
+        $('#engine-control-abs-minus-1').click(async function () {
+            if (selectedEngine == null) return
+            let speed = parseInt($('#engine-current-speed-slider').val())
+            if (isNaN(speed)) return
+            const max = parseInt($('#engine-current-speed-slider').attr('max'))
+            if (speed <= 0) {
+                return
+            }
+            speed--
+            await axiosPost('/engine/control', { engineId: selectedEngine, type: 'setSpeed', speed })
+            $('#engine-current-speed-slider').val(speed)
+            $('#engine-current-speed').html($('#engine-current-speed-slider').val())
+        })
+
         $('#engine-control-direction-forward').click(async function () {
             if (selectedEngine == null) return
             await axiosPost('/engine/control', { engineId: selectedEngine, type: 'forwardDirection' })
@@ -775,6 +808,16 @@
         $('#engine-control-direction-backward').click(async function () {
             if (selectedEngine == null) return
             await axiosPost('/engine/control', { engineId: selectedEngine, type: 'backwardDirection' })
+        })
+
+        $('#engine-control-coupler-forward').click(async function () {
+            if (selectedEngine == null) return
+            await axiosPost('/engine/control', { engineId: selectedEngine, type: 'couplerFront' })
+        })
+
+        $('#engine-control-coupler-backward').click(async function () {
+            if (selectedEngine == null) return
+            await axiosPost('/engine/control', { engineId: selectedEngine, type: 'couplerRear' })
         })
 
         $('#engine-control-halt').click(async function () {
