@@ -6,14 +6,9 @@ import HID from 'node-hid'
 import { DualsenseController } from '../control/dualsenseController'
 import { Engine } from '../engine/engine'
 import { EngineController } from '../engine/engineController'
-import {
-    AvailablePort,
-    ControlPort,
-    FriendlySerialPort,
-    SerialController,
-} from '../serial/serialController'
-import { Control } from './control'
-import { routerMiddleware } from './control-middleware'
+import { AvailablePort, SerialController } from '../serial/serialController'
+import { Control } from './routerController'
+import { routerMiddleware } from './routerMiddleware'
 
 export type Router = {}
 
@@ -24,7 +19,7 @@ export const Router = (
 ): Router => {
     const app = express()
 
-    const control = Control(engineController, serialController)
+    const control = Control(engineController)
     control.startProcessing().then(() => {
         console.log('Router middleware controller started')
     })
