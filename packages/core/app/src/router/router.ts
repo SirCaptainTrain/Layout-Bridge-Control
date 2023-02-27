@@ -85,6 +85,15 @@ export const Router = (
         res.send({ ...newEngine.getEngineInfo(), path: req.body.com })
     })
 
+    app.delete('/engine/:id', async (req, res) => {
+        const engine = engineController.getEngine(req.params.id)
+        if (engine == null) {
+            return res.sendStatus(400)
+        }
+        await engineController.removeEngine(engine.getId())
+        res.sendStatus(200)
+    })
+
     app.get('/engine/:id', (req, res) => {
         const engine = engineController.getEngine(req.params.id)
         if (engine == null) {

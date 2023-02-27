@@ -72,7 +72,10 @@ export const LBCDatabase = async (): Promise<LBCDatabase> => {
         )
     }
 
-    const removeEngine = async (engineId: string) => {}
+    const removeEngine = async (engineId: string) => {
+        const stmt = await db.prepare('DELETE FROM engines WHERE id = ?')
+        await stmt.run(engineId)
+    }
 
     const addSerial = async (
         serialNumber: string,

@@ -53,11 +53,11 @@
                                 <button class="btn btn-primary" id="btn-add-engine" disabled><i
                                         class="fas fa-plus"></i></button>
                                 <span class="lead">|</span>
-                                <button class="btn btn-primary eng-data-btn" disabled><i
+                                <button class="btn btn-primary eng-data-btn" id="btn-edit-engine" disabled><i
                                         class="fas fa-edit"></i></button>
                                 <button class="btn btn-primary eng-data-btn" id="btn-engine-control" disabled><i
                                         class="fas fa-gamepad"></i></button>
-                                <button class="btn btn-primary eng-data-btn" disabled><i
+                                <button class="btn btn-primary eng-data-btn" id="btn-remove-engine" disabled><i
                                         class="fas fa-minus"></i></button>
                                 <button class="mx-2 btn btn-sm btn-primary d-none" id="selected-engine"
                                     disabled></button>
@@ -293,6 +293,25 @@
                 </div>
             </div>
         </div>
+        <div class="modal fade" tabindex="-1" id="confirm-engine-delete">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Delete Engine</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to the following engine:
+                        <div>ID: <span id="delete-engine-id"></span></div>
+                        <div>Engine ID: <span id="delete-engine-cid"></span></div>
+                        <div>Engine Type: <span id="delete-engine-ctype"></span></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="btn-confirm-engine-delete" class="btn btn-danger">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/js/bootstrap.min.js"
@@ -317,6 +336,10 @@
 
     let activePorts = []
     let engines = []
+
+    const axiosDelete = async (path) => {
+        return await axios.delete(`${APP_PATH}${path}`)
+    }
 
     const axiosGet = async (path) => {
         return await axios.get(`${APP_PATH}${path}`)
@@ -561,6 +584,42 @@
                 }
             }
             $('#add-engine').modal('show');
+        })
+
+        $('#btn-remove-engine').click(async function () {
+            if (selectedEngine == null) {
+                setEngineButtonsActive(false)
+                $('#selected-engine').toggleClass('d-none', true)
+                return
+            }
+            const engineInfoRes = await axiosGet(`/engine/${selectedEngine}`)
+            if (engineInfoRes.data == null || typeof engineInfoRes.data !== 'object') {
+                selectedEngine = null
+                setEngineButtonsActive(false)
+                $('#selected-engine').toggleClass('d-none', true)
+                return
+            }
+            $('#delete-engine-id').html(selectedEngine)
+            $('#delete-engine-cid').html(engineInfoRes.data.controlId)
+            $('#delete-engine-ctype').html(engineInfoRes.data.controlType)
+            $('#confirm-engine-delete').modal('show')
+
+        })
+
+        $('#btn-confirm-engine-delete').click(async function () {
+            if (selectedEngine == null) return
+            console.log('delete', selectedEngine)
+            try {
+                await axiosDelete(`/engine/${selectedEngine}`)
+
+                selectedEngine = null
+                setEngineButtonsActive(false)
+            } catch (err) {
+                console.log(err)
+            }
+            $('#confirm-engine-delete').modal('hide')
+            $('#selected-engine').toggleClass('d-none', true)
+            await getEngineList()
         })
 
         $('#btn-add-engine-submit').click(async function () {

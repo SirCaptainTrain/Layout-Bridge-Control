@@ -17,7 +17,7 @@ export type EngineController = {
         dbInsert?: boolean
     ) => Promise<Engine>
     updateEngine: (engineId: string, engineInfo: EngineInfo) => void
-    removeEngine: (engineId: string) => void
+    removeEngine: (engineId: string) => Promise<void>
 }
 
 export const EngineController = (database: LBCDatabase): EngineController => {
@@ -86,7 +86,7 @@ export const EngineController = (database: LBCDatabase): EngineController => {
         return engine
     }
 
-    const removeEngine = (engineId: string) => {
+    const removeEngine = async (engineId: string) => {
         const engineIndex = engines.findIndex(
             (engine) => engine.getId() === engineId
         )
@@ -94,6 +94,10 @@ export const EngineController = (database: LBCDatabase): EngineController => {
             return
         }
         engines = engines.filter((engine) => engine.getId() !== engineId)
+        const dbEngines = await database.getEngineList()
+        if (dbEngines.find((dbEngine) => dbEngine.id === engineId)) {
+            await database.removeEngine(engineId)
+        }
     }
 
     const updateEngine = (engineId: string, engineInfo: EngineInfo) => {
